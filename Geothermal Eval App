@@ -1,0 +1,61 @@
+import React, { useState } from "react";
+import Head from "next/head";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
+
+export default function Home() {
+  const [wellDepth, setWellDepth] = useState(0);
+  const [flowRate, setFlowRate] = useState(0);
+  const [thermalConductivity, setThermalConductivity] = useState(0);
+  const [heatExchange, setHeatExchange] = useState(null);
+
+  const calculateHeatExchange = async () => {
+    try {
+      const response = await axios.post("https://your-backend-api.com/calculate", {
+        wellDepth,
+        flowRate,
+        thermalConductivity,
+      });
+      setHeatExchange(response.data.result);
+    } catch (error) {
+      console.error("Error calculating heat exchange", error);
+    }
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Geothermal Well Evaluation</title>
+      </Head>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+        <Card className="w-full max-w-lg p-6">
+          <CardContent>
+            <h1 className="text-xl font-bold mb-4">Geothermal Well Heat Exchange Calculator</h1>
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-1">Well Depth (ft)</label>
+                <Input type="number" value={wellDepth} onChange={(e) => setWellDepth(e.target.value)} />
+              </div>
+              <div>
+                <label className="block mb-1">Flow Rate (GPM)</label>
+                <Input type="number" value={flowRate} onChange={(e) => setFlowRate(e.target.value)} />
+              </div>
+              <div>
+                <label className="block mb-1">Thermal Conductivity (W/mK)</label>
+                <Input type="number" value={thermalConductivity} onChange={(e) => setThermalConductivity(e.target.value)} />
+              </div>
+              <Button onClick={calculateHeatExchange} className="w-full">Calculate</Button>
+              {heatExchange && (
+                <div className="mt-4 p-4 bg-green-100 text-green-800 rounded-md">
+                  <strong>Estimated Heat Exchange:</strong> {heatExchange} kW
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
+}
